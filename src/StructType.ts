@@ -1,30 +1,44 @@
+const dataMap: Array<TypeFunc> = []
+
 type TypeFunc = {
     getFunc: (index: number) => number | bigint;
     setFunc: (index: number, value: number | bigint) => void;
     offset: number;
 };
 
+export enum STRUCT_TYPE {
+    int8 = 0,
+    uint8 = 1,
+    int16 = 2,
+    uint16 = 3,
+    int32 = 4,
+    uint32 = 5,
+    int64 = 6,
+    uint64 = 7,
+    float32 = 8,
+    float64 = 9
+};
+
 export default class StructType {
     #bytesArray: DataView
     #struct: any
-    #dataMap: Map<string, TypeFunc>
+
     #shared: boolean
 
     constructor(structType: object, shared: boolean, packing: number = 1, arr: ArrayBuffer | SharedArrayBuffer | null = null) {
         this.#shared = shared
-        this.#dataMap = new Map()
-        this.#dataMap.set("int8", { getFunc: this.#getInt8, setFunc: this.#setInt8, offset: 1 })
-        this.#dataMap.set("uint8", { getFunc: this.#getUint8, setFunc: this.#setUint8, offset: 1 })
-        this.#dataMap.set("int16", { getFunc: this.#getInt16, setFunc: this.#setInt16, offset: 2 })
-        this.#dataMap.set("uint16", { getFunc: this.#getUint16, setFunc: this.#setUint16, offset: 2 })
-        this.#dataMap.set("int32", { getFunc: this.#getInt32, setFunc: this.#setInt32, offset: 4 })
-        this.#dataMap.set("uint32", { getFunc: this.#getUint32, setFunc: this.#setUint32, offset: 4 })
-        this.#dataMap.set("int64", { getFunc: this.#getInt64, setFunc: this.#setInt64, offset: 8 })
-        this.#dataMap.set("uint64", { getFunc: this.#getUint64, setFunc: this.#setUint64, offset: 8 })
-        this.#dataMap.set("float32", { getFunc: this.#getFloat32, setFunc: this.#setFloat32, offset: 4 })
-        this.#dataMap.set("float64", { getFunc: this.#getFloat64, setFunc: this.#setFloat64, offset: 8 })
+        dataMap.push({ getFunc: this.#getInt8, setFunc: this.#setInt8, offset: 1 })
+        dataMap.push({ getFunc: this.#getUint8, setFunc: this.#setUint8, offset: 1 })
+        dataMap.push({ getFunc: this.#getInt16, setFunc: this.#setInt16, offset: 2 })
+        dataMap.push({ getFunc: this.#getUint16, setFunc: this.#setUint16, offset: 2 })
+        dataMap.push({ getFunc: this.#getInt32, setFunc: this.#setInt32, offset: 4 })
+        dataMap.push({ getFunc: this.#getUint32, setFunc: this.#setUint32, offset: 4 })
+        dataMap.push({ getFunc: this.#getInt64, setFunc: this.#setInt64, offset: 8 })
+        dataMap.push({ getFunc: this.#getUint64, setFunc: this.#setUint64, offset: 8 })
+        dataMap.push({ getFunc: this.#getFloat32, setFunc: this.#setFloat32, offset: 4 })
+        dataMap.push({ getFunc: this.#getFloat64, setFunc: this.#setFloat64, offset: 8 })
         const bytes = this.#calcOffsets(structType, packing)
-        if(arr == null)
+        if (arr == null)
             this.#bytesArray = new DataView(shared ? new SharedArrayBuffer(bytes) : new ArrayBuffer(bytes))
         else
             this.#bytesArray = new DataView(arr)
@@ -70,8 +84,8 @@ export default class StructType {
     #calcOffsets(structType: object, pack: number) {
         let offset: number = 0
         this.#struct = {}
-        for (const key of Object.keys(structType)) {
-            const val = this.#dataMap.get((structType as any)[key]) as TypeFunc
+        for (const key in structType) {
+            const val = dataMap[(structType as any)[key]] as TypeFunc
             if (val != undefined) {
                 this.#struct[key] = { getFunc: val["getFunc"], setFunc: val["setFunc"], offset: offset }
                 if (val["offset"] < pack)

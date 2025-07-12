@@ -5,16 +5,11 @@
         "name": "TS-Node",
         "type": "node",
         "request": "launch",
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node",
-        "runtimeArgs": [
-          "--transpile-only",
-          // if you use esm
-          "--esm" 
-        ],
-        "program": "${file}",
+        "program": "${workspaceFolder}/out/src/index.js",
         "cwd": "${workspaceRoot}",
         "internalConsoleOptions": "openOnSessionStart",
         "skipFiles": ["<node_internals>/**", "node_modules/**"],
+        "sourceMaps": true,
         "preLaunchTask": "build",
       }
     ]

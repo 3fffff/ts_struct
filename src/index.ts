@@ -1,6 +1,6 @@
-import StructType from "./StructType.js"
+import StructType, { STRUCT_TYPE } from "./StructType.js"
 
-const test = { a: "int8", b: "uint16", c: "float32" }
+const test = { a: STRUCT_TYPE.int8, b: STRUCT_TYPE.uint16, c: STRUCT_TYPE.float32 }
 const str = new StructType(test, true, 1)
 console.log(str.getValue("a"))
 console.log("hello")
